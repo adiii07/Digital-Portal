@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block content %}
+  <article class="media content-section"><div class="media-body">
+      <div class="article-metadata">
+        <h4 class="mr-2" href="#">{{ post.author.name }}</h4>
+        <h6 class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</h6>
+      </div>
+      <h2 class="article-title">{{ post.title }}</h2>
+      <p class="article-content">{{ post.content }}</p>
+      
+      {% if current_user.user_type == 'student' -%}
+      {% if post.doc %}
+      <article class="media content-section">
+        <a href="{{ url_for('download') }}">Download File</a></article>
+        {% endif %}
+          <div class="content-section">
+            <form method="POST" action="" enctype="multipart/form-data">
+              <h5>Turn in assignment</h5>
+              <legend class="border-bottom mb-4">{{ legend }}</legend>
+                {{ form.hidden_tag() }}
+                <fieldset class="form-group">
+                    <input type="file" name="file">
+                </fieldset>
+                <div class="form-group">
+                    {{ form.turn_in(class="btn btn-outline-info") }}
+                </div>
+            </form>
+        </div>
+      {% endif %}
+      
+      <legend class="border-bottom mb-4">{{ legend }}</legend>
+        {% if current_user.user_type != 'student' -%}
+        <h3 class="turned_in">Student Submissions</h3>
+        {% for i in range(turn_in_len) %}
+            <h5>{{ turn_ins[i].st_name }}  {{ turn_ins[i].date_posted.strftime('%H:%M %a') }} 
+            <a href="{{ url_for('download_assign', i=i) }}">{{ turn_ins[i].doc_name }}</a></h5>
+        {% endfor %}
+        {% endif %}
+
+    </div>
+  </article>
+{% endblock content %}

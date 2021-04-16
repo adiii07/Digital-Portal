@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div>
+    <h3>{{ current_user.name }}</h3>
+    <h3>{{ current_user.user_type }}</h3>
+    <h3>{{ current_user.school }}</h3>
+    <a class='change' href="{{ url_for('change_pass') }}">Change Password</a>
+    </div>
+{% endblock content %}
