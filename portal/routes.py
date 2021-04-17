@@ -1,8 +1,8 @@
 from flask import render_template, url_for, redirect, flash, request, send_file
 from portal import app, db, bcrypt
 from portal.forms import RegistrationForm, LoginForm, AddUsersForm, ChangePasswordForm
-from portal.forms import PostForm, AssignForm, TurnInForm
-from portal.models import User, Post, Assignment
+from portal.forms import PostForm, TurnInForm
+from portal.models import User, Post, Assignment, Reply
 from flask_login import login_user, current_user, logout_user, login_required
 from io import BytesIO
 
@@ -100,28 +100,19 @@ def change_pass():
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, 
+        if current_user.user_type != 'student':
+            uploaded_file = request.files['file']
+            file_name = uploaded_file.filename
+            post = Post(title=form.title.data, content=form.content.data, 
+                author=current_user, doc=uploaded_file.read(), assigned_doc_name=file_name)
+        else:
+            post = Post(title=form.title.data, content=form.content.data, 
                 author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Post created', 'success')
         return redirect(url_for('home'))
     return render_template('create_post.html', form=form, title='New Post')
-
-@app.route("/assign/new/", methods=['GET', 'POST'])
-@login_required
-def new_assign():
-    form = AssignForm()
-    if form.validate_on_submit():
-        uploaded_file = request.files['file']
-        file_name = uploaded_file.filename
-        post = Post(title=form.title.data, content=form.content.data, 
-                author=current_user, doc=uploaded_file.read(), assigned_doc_name=file_name)
-        db.session.add(post)
-        db.session.commit()
-        flash('Assignment created', 'success')
-        return redirect(url_for('home'))
-    return render_template('create_assign.html', form=form, title='New Post')
 
 @app.route("/download/")
 @login_required
@@ -135,12 +126,17 @@ def download():
 @login_required
 def post(post_id):
     global current_post
+    global postid
     global st_file_data
     global turn_ins
     current_post = Post.query.get_or_404(post_id)
-    form = TurnInForm()
+    post_id = current_post.id
     turn_ins = Assignment.query.filter_by(post=current_post.id).all()
     turn_in_len = len(turn_ins)
+    post_user_type = current_post.author.user_type
+    replies = Reply.query.filter_by(post_id=current_post.id)
+     
+    form = TurnInForm()
     if form.validate_on_submit():
         uploaded_file = request.files['file']
         assign_name = uploaded_file.filename
@@ -150,7 +146,20 @@ def post(post_id):
         db.session.commit()
         flash('Assignment turned in!', 'success')
         return redirect(url_for('home'))
-    return render_template('post.html', post=current_post, form=form, turn_ins=turn_ins, turn_in_len=turn_in_len)
+
+    return render_template('post.html', post=current_post, replies=replies, form=form, turn_ins=turn_ins, turn_in_len=turn_in_len, post_user_type=post_user_type)
+
+@app.route("/reply/", methods=['GET', 'POST'])
+@login_required
+def reply():
+    form = PostForm()
+    if form.validate_on_submit():
+        reply = Reply(user=current_user, content=form.content.data, post=current_post)
+        db.session.add(reply)
+        db.session.commit()
+        flash('Replied to {}'.format(current_post.author.name), 'success')
+        return redirect(url_for('post', current_post.id))
+    return render_template('reply.html', form=form, post=current_post)
 
 @app.route("/download_assignment/<int:i>/")
 @login_required

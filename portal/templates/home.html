@@ -2,21 +2,14 @@
 {%block content%}
 <h1>Home</h1>
 <div class="home">
-        {% if current_user.is_authenticated %}
+    {% if current_user.is_authenticated %}
         <ul class='newpost'> 
         <li><a class='change' href="{{ url_for('new_post') }}">New Post</a></li>
-        <li>{% if current_user.user_type != 'student' -%}
-        <a class='change', href="{{ url_for('new_assign') }}">New Assignment</a>
-        {% endif %}</li>
-        {% if current_user.user_type == 'admin' -%}
-        <li><a class='change' href="{{ url_for('add_users') }}">Add Users</a></li>
-        {% else %}
-        <p>
-            Register your school in the register page.
-            For more information go to about page.
-        </p>
-        {% endif %}
-        </ul>
+        
+            {% if current_user.user_type == 'admin' -%}
+                <li><a class='change' href="{{ url_for('add_users') }}">Add Users</a></li>
+            {% endif %}
+            </ul>
         {% for post in posts %}
             <article class="media content-section">
             <div class="media-body">
@@ -29,6 +22,11 @@
             </div>
             </article>
         {% endfor %}
-        {% endif %}
+    {% else %}
+        <p>
+            Register your school in the register page.
+            For more information go to about page.
+        </p>
+    {% endif %}
 </div>
 {%endblock%}

@@ -55,10 +55,8 @@ class PostForm(FlaskForm):
     content = TextAreaField('Content', validators=[DataRequired()])
     submit = SubmitField('Post')
 
-class AssignForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    content = TextAreaField('Content', validators=[DataRequired()])
-    submit = SubmitField('Post')
-
 class TurnInForm(FlaskForm):
     turn_in = SubmitField('Turn In')
+
+class ReplyForm(FlaskForm):
+    reply = SubmitField('Reply')

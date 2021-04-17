@@ -30,6 +30,9 @@
                     {{ form.content(class="form-control form-control-lg") }}
                 {% endif %}
             </div>
+            {% if current_user.user_type != 'student' -%}
+                <input type="file" name="file">
+            {% endif %}
         </fieldset>
         <div class="form-group">
             {{ form.submit(class="btn btn-outline-info") }}
