@@ -7,7 +7,7 @@
       </div>
       <h2 class="article-title">{{ post.title }}</h2>
       <p class="article-content">{{ post.content }}</p>
-      
+
       {% if current_user.user_type == 'student' -%}
       {% if post_user_type != 'student' -%}
       {% if post.doc %}
@@ -30,17 +30,30 @@
       {% endif %}
       {% endif %}
 
-      <a href="{{ url_for('reply') }}">Reply</a>
+      <h5><a href="{{ url_for('reply', postid=post.id) }}">Reply</a></h5>
+      <legend class="border-bottom mb-4">{{ legend }}</legend>
 
-      {% if post_user_type != 'student' -%}
+      <h3 class="turned_in">Replies</h3>
+      {% for reply in replies %}
+      <article class="media content-section">
+        <div class="media-body">
+            <div class="article-metadata">
+              <h6 class="text-muted"></h6>
+            <h6 class="mr-2" href="#">{{ reply.date.strftime('%a %H:%M') }} {{ reply.replier.name }}: {{ reply.content }}</h6>
+            </div>
+        </div>
+        </article>
+      {% endfor %}
+
+      {% if current_user.user_type != 'student' -%}
         <legend class="border-bottom mb-4">{{ legend }}</legend>
         <h3 class="turned_in">Student Submissions</h3>
         {% for i in range(turn_in_len) %}
-            <h5>{{ turn_ins[i].st_name }}  {{ turn_ins[i].date_posted.strftime('%H:%M %a') }} 
+            <h5>{{ turn_ins[i].st_name }}  {{ turn_ins[i].date_posted.strftime('%a %H:%M') }}
             <a href="{{ url_for('download_assign', i=i) }}">{{ turn_ins[i].doc_name }}</a></h5>
         {% endfor %}
         {% endif %}
-        
+
     </div>
   </article>
 {% endblock content %}

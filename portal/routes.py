@@ -73,12 +73,12 @@ def add_users():
             db.session.commit()
             flash(f'{new_user.login_id} is added', 'success')
             return redirect(url_for('add_users'))
-    return render_template('add_users.html', form=form, title='Account')  
+    return render_template('add_users.html', form=form, title='Account')
 
 @app.route("/account/", methods=['GET', 'POST'])
 @login_required
 def account():
-    return render_template('account.html')  
+    return render_template('account.html')
 
 @app.route("/changepass/", methods=['GET', 'POST'])
 @login_required
@@ -103,10 +103,10 @@ def new_post():
         if current_user.user_type != 'student':
             uploaded_file = request.files['file']
             file_name = uploaded_file.filename
-            post = Post(title=form.title.data, content=form.content.data, 
+            post = Post(title=form.title.data, content=form.content.data,
                 author=current_user, doc=uploaded_file.read(), assigned_doc_name=file_name)
         else:
-            post = Post(title=form.title.data, content=form.content.data, 
+            post = Post(title=form.title.data, content=form.content.data,
                 author=current_user)
         db.session.add(post)
         db.session.commit()
@@ -119,28 +119,29 @@ def new_post():
 def download():
     file_data = Post.query.filter_by(id=current_post.id).first()
     if file_data.doc:
-        return send_file(BytesIO(file_data.doc), attachment_filename=file_data.assigned_doc_name, 
+        return send_file(BytesIO(file_data.doc), attachment_filename=file_data.assigned_doc_name,
                                 as_attachment=True)
 
 @app.route("/post/<int:post_id>/", methods=['GET', 'POST'])
 @login_required
 def post(post_id):
     global current_post
-    global postid
-    global st_file_data
     global turn_ins
     current_post = Post.query.get_or_404(post_id)
     post_id = current_post.id
     turn_ins = Assignment.query.filter_by(post=current_post.id).all()
     turn_in_len = len(turn_ins)
     post_user_type = current_post.author.user_type
-    replies = Reply.query.filter_by(post_id=current_post.id)
-     
+    all_replies = Reply.query.filter_by(post_id=current_post.id).all()
+    replies = []
+    for reply in reversed(all_replies):
+        replies.append(reply)
+
     form = TurnInForm()
     if form.validate_on_submit():
         uploaded_file = request.files['file']
         assign_name = uploaded_file.filename
-        assignment = Assignment(submitted_doc=uploaded_file.read(), 
+        assignment = Assignment(submitted_doc=uploaded_file.read(),
                                 post=post_id, doc_name=assign_name, st_name=current_user.name)
         db.session.add(assignment)
         db.session.commit()
@@ -149,22 +150,22 @@ def post(post_id):
 
     return render_template('post.html', post=current_post, replies=replies, form=form, turn_ins=turn_ins, turn_in_len=turn_in_len, post_user_type=post_user_type)
 
-@app.route("/reply/", methods=['GET', 'POST'])
-@login_required
-def reply():
+@app.route("/reply/<int:postid>/", methods=['GET', 'POST'])
+def reply(postid):
     form = PostForm()
-    if form.validate_on_submit():
-        reply = Reply(user=current_user, content=form.content.data, post=current_post)
+    if request.method == 'POST':
+        reply = Reply(user_id=current_user.id, content=form.content.data, 
+                    post_id=postid, u_name=current_user.name)
         db.session.add(reply)
         db.session.commit()
-        flash('Replied to {}'.format(current_post.author.name), 'success')
-        return redirect(url_for('post', current_post.id))
-    return render_template('reply.html', form=form, post=current_post)
+        flash('Replied to {}'.format(Post.query.filter_by(id=postid).first().author.name), 'success')
+        return redirect(url_for('post', post_id=postid))
+    return render_template('reply.html', form=form)
 
 @app.route("/download_assignment/<int:i>/")
 @login_required
 def download_assign(i):
-    return send_file(BytesIO(turn_ins[i].submitted_doc), 
+    return send_file(BytesIO(turn_ins[i].submitted_doc),
             attachment_filename=turn_ins[i].doc_name, as_attachment=True)
 
 @app.route("/logout/")

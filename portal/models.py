@@ -15,7 +15,8 @@ class User(db.Model, UserMixin):
     school    = db.Column(db.String, nullable=False)
     password  = db.Column(db.String(60), nullable=False)
     posts     = db.relationship('Post', backref='author', lazy=True)
-    
+    replies   = db.relationship('Reply', backref='replier', lazy=True)
+
     def __repr__(self):
         return f"User('{self.name}', '{self.login_id}', '{self.email}')"
 
@@ -27,20 +28,20 @@ class Post(db.Model):
     doc               = db.Column(db.String, nullable=True)
     assigned_doc_name = db.Column(db.String, nullable=True)
     user_id           = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    replies           = db.relationship('Reply', backref='post', lazy=True)
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
 
 class Reply(db.Model):
     id      = db.Column(db.Integer, primary_key=True)
-    user    = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
     date    = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    content = db.Column(db.Text, nullable=False)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    content = db.Column(db.Text, nullable=True)
+    post_id = db.Column(db.Integer, nullable=False)
+    u_name  = db.Column(db.String, db.ForeignKey('user.name'), nullable=False)
 
     def __repr__(self):
-        return f"Post('{self.user}', '{self.date_posted}', '{self.post_id}')"
+        return f"Post('{self.user}', '{self.date}', '{self.post_id}')"
 
 class Assignment(db.Model):
     id            = db.Column(db.Integer, primary_key=True)
@@ -52,4 +53,3 @@ class Assignment(db.Model):
 
     def __repr__(self):
         return f"Post('{self.st_name}', '{self.date_posted}')"
-
