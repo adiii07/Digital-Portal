@@ -58,11 +58,17 @@ h3 {
 }
 
 .change {
-  /* padding-left: px ; */
+  font-size: 1.2em;
+  margin-top: 30px;
+  text-align: left;
+  color: rgb(110, 142, 150);
+}
+
+.changepass {
   font-size: 1.2em;
   margin-top: 30px;
   text-align: center;
-  color: rgb(110, 142, 150)
+  color: rgb(110, 142, 150);
 }
 
 .menu-right {
@@ -135,4 +141,13 @@ h6 {
   color: #cbc5eabd;
   text-decoration: underline;
   text-shadow: 0.3px 0.3px rgb(167, 166, 166);
+}
+
+table, th, td {
+  border: 2px solid black;
+  text-align: center;
+}
+
+table {
+  width: 100%;
 }

@@ -8,8 +8,10 @@
             An account will be created for the admin.
             This admin can add other admins, teachers and students.
             Admin should provide the newly added members with their login ids.
+            {% if current_user.user_type == 'admin' -%}
             Their passwords will be 123456.
             They should immediately change their passwords. 
+            {% endif %}
             Teachers can assign homework for students.
             Students can turn in their completed assignments and the teachers will be able to
             download the submissions.

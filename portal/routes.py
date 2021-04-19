@@ -167,7 +167,7 @@ def reply(postid):
 def download_assign(i):
     return send_file(BytesIO(turn_ins[i].submitted_doc),
             attachment_filename=turn_ins[i].doc_name, as_attachment=True)
-
+            
 @app.route("/logout/")
 def logout():
     logout_user()

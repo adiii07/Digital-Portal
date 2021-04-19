@@ -1,9 +1,20 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div>
-    <h3>{{ current_user.name }}</h3>
-    <h3>{{ current_user.user_type }}</h3>
-    <h3>{{ current_user.school }}</h3>
-    <a class='change' href="{{ url_for('change_pass') }}">Change Password</a>
+<div>
+    <h3 class="turned_in">My Information</h3>
+    <a class='changepass' href="{{ url_for('change_pass') }}">Change Password</a>
+        <table>
+            <tr>
+                <th><h4>Name</h4></th>
+                <th><h4>User</h4></th>
+                <th><h4>School</h4></th>
+            </tr>
+            <tr>
+                <td><h4>{{ current_user.name }}</h4></td>
+                <td><h4>{{ current_user.user_type }}</h4></td>
+                <td><h4>{{ current_user.school }}</h4></td>
+            </tr>
+        </table> 
     </div>
-{% endblock content %}
+    
+    {% endblock content %}

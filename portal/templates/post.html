@@ -31,9 +31,11 @@
       {% endif %}
 
       <h5><a href="{{ url_for('reply', postid=post.id) }}">Reply</a></h5>
+      
+      {% if replies %}
       <legend class="border-bottom mb-4">{{ legend }}</legend>
-
       <h3 class="turned_in">Replies</h3>
+      {% endif %}
       {% for reply in replies %}
       <article class="media content-section">
         <div class="media-body">
@@ -46,11 +48,21 @@
       {% endfor %}
 
       {% if current_user.user_type != 'student' -%}
+      {% if turn_ins %}
         <legend class="border-bottom mb-4">{{ legend }}</legend>
         <h3 class="turned_in">Student Submissions</h3>
+        {% endif %}
         {% for i in range(turn_in_len) %}
-            <h5>{{ turn_ins[i].st_name }}  {{ turn_ins[i].date_posted.strftime('%a %H:%M') }}
-            <a href="{{ url_for('download_assign', i=i) }}">{{ turn_ins[i].doc_name }}</a></h5>
+          <table>
+            <tr>
+                <th><h4>Name</h4></th>
+                <th><h4>File</h4></th>
+            </tr>
+            <tr>
+                <td><h4>{{ turn_ins[i].st_name }}</h4></td>
+                <td><h4><a href="{{ url_for('download_assign', i=i) }}">{{ turn_ins[i].doc_name }}</a></h4></td>
+            </tr>
+        </table> 
         {% endfor %}
         {% endif %}
 
